@@ -1,0 +1,96 @@
+import os
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+
+TOKEN = os.getenv("BOT_TOKEN")
+
+
+def main_menu():
+    keyboard = [
+        [InlineKeyboardButton("🎁 Получить START PACK", callback_data="start_pack")],
+        [InlineKeyboardButton("📚 PROFITx Academy", callback_data="academy")],
+        [InlineKeyboardButton("📈 Инвестиции", callback_data="invest")],
+        [InlineKeyboardButton("🏠 Недвижимость", callback_data="real_estate")],
+        [InlineKeyboardButton("💰 CashFlow", callback_data="cashflow")],
+        [InlineKeyboardButton("👤 О PROFITx", callback_data="about")],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = (
+        "🎓 Добро пожаловать в PROFITx Academy!\n\n"
+        "Здесь ты получишь практические материалы по деньгам, активам, инвестициям "
+        "и созданию капитала.\n\n"
+        "👇 Выбери раздел:"
+    )
+    await update.message.reply_text(text, reply_markup=main_menu())
+
+
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == "start_pack":
+        text = (
+            "🎁 START PACK PROFITx\n\n"
+            "Первый материал:\n"
+            "✅ 7 вопросов перед любой покупкой\n\n"
+            "Скоро здесь будет PDF-файл и дополнительные инструменты."
+        )
+
+    elif query.data == "academy":
+        text = (
+            "📚 PROFITx Academy\n\n"
+            "Здесь будут уроки:\n"
+            "1. Активы и пассивы\n"
+            "2. Финансовое мышление\n"
+            "3. Первые шаги к капиталу\n"
+            "4. Инвестиции\n"
+            "5. Денежный поток"
+        )
+
+    elif query.data == "invest":
+        text = (
+            "📈 Инвестиции\n\n"
+            "Здесь появятся материалы по активам, рискам, стратегиям и первым шагам инвестора."
+        )
+
+    elif query.data == "real_estate":
+        text = (
+            "🏠 Недвижимость\n\n"
+            "Раздел для материалов по недвижимости, капиталу и денежному потоку."
+        )
+
+    elif query.data == "cashflow":
+        text = (
+            "💰 CashFlow\n\n"
+            "Здесь будут материалы о создании источников дохода и управлении деньгами."
+        )
+
+    elif query.data == "about":
+        text = (
+            "👤 О PROFITx\n\n"
+            "PROFITx — это бренд о финансовом мышлении, капитале, инвестициях "
+            "и создании активов.\n\n"
+            "Цель — помочь людям начать думать как инвесторы."
+        )
+
+    else:
+        text = "Раздел скоро будет доступен."
+
+    await query.edit_message_text(text=text, reply_markup=main_menu())
+
+
+def run_bot():
+    if not TOKEN:
+        raise RuntimeError("BOT_TOKEN не найден. Добавь его в переменные окружения Render.")
+
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(button))
+    app.run_polling()
+
+
+if name == "__main__":
+    run_bot()
